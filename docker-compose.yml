@@ -1,0 +1,49 @@
+version: '3.8'
+services:
+  user-service:
+    build: ./user-service
+    ports:
+      - "3001:3001"
+    networks:
+      - nic-network
+
+  nic-validation-service:
+    build: ./nic-validation-service
+    ports:
+      - "3002:3002"
+    networks:
+      - nic-network
+
+  data-management-service:
+    build: ./data-management-service
+    ports:
+      - "3003:3003"
+    networks:
+      - nic-network
+    environment:
+      - DB_HOST=mysql
+      - DB_USER=root
+      - DB_PASSWORD=example
+      - DB_NAME=nic_db
+
+  reporting-service:
+    build: ./reporting-service
+    ports:
+      - "3004:3004"
+    networks:
+      - nic-network
+
+  mysql:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: nic_db
+    ports:
+      - "3306:3306"
+    networks:
+      - nic-network
+
+networks:
+  nic-network:
+    driver: bridge
