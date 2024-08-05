@@ -1,14 +1,20 @@
 const express = require('express');
 const { Sequelize, DataTypes } = require('sequelize');
+require('dotenv').config(); // Load environment variables
 
 const app = express();
 app.use(express.json());
 
-// Set up Sequelize connection
-const sequelize = new Sequelize('database', 'username', 'password', {
-  host: 'localhost',
-  dialect: 'mysql',
-});
+// Set up Sequelize connection using environment variables
+const sequelize = new Sequelize(
+  process.env.DB_NAME, // database name
+  process.env.DB_USER, // username
+  process.env.DB_PASSWORD, // password
+  {
+    host: process.env.DB_HOST, // host
+    dialect: 'mysql',
+  }
+);
 
 // Define NIC model
 const NIC = sequelize.define('NIC', {
@@ -32,6 +38,13 @@ app.post('/save-nic', async (req, res) => {
   }
 });
 
-app.listen(3003, () => {
-  console.log('Data management service running on port 3003');
+// Start the server and authenticate database connection
+app.listen(3003, async () => {
+  try {
+    console.log('Data management service running on port 3003');
+    await sequelize.authenticate();
+    console.log('Database connection established.');
+  } catch (error) {
+    console.error('Unable to connect to the database:', error);
+  }
 });
