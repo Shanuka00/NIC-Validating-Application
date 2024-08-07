@@ -17,11 +17,20 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   const { username, password } = req.body;
   try {
+
     const user = await User.findOne({ where: { username } });
-    if (!user || !await bcrypt.compare(password, user.password)) {
+    if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    console.log('Generated token:', token);
+
     res.json({ message: 'Login successful', token });
   } catch (error) {
     res.status(500).json({ error: 'Failed to login' });

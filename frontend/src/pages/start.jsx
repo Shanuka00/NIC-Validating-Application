@@ -8,7 +8,7 @@ function Start() {
   useEffect(() => {
     const timer = setTimeout(() => {
       navigate('/login');
-    }, 4500); // 4500 milliseconds
+    }, 4500); // Waiting 4500 milliseconds
 
     // Cleanup the timer if the component unmounts
     return () => clearTimeout(timer);
