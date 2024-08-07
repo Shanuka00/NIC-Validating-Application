@@ -1,6 +1,21 @@
 const jwt = require('jsonwebtoken');
 
-const authMiddleware = (req, res, next) => {
+exports.validateRegister = (req, res, next) => {
+  const { username, email, password, retypePassword } = req.body;
+
+  if (!username || !email || !password || !retypePassword) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ error: 'Invalid email format' });
+  }
+
+  next();
+};
+
+exports.authMiddleware = (req, res, next) => {
   const token = req.headers['authorization'];
   if (!token) {
     return res.status(403).json({ error: 'No token provided' });
@@ -13,5 +28,3 @@ const authMiddleware = (req, res, next) => {
     next();
   });
 };
-
-module.exports = authMiddleware;
