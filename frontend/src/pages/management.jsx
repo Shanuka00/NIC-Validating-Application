@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import 'tailwindcss/tailwind.css';
 
@@ -10,7 +10,8 @@ function Management() {
     file_name: ''
   });
 
-  const fetchData = async () => {
+  // Memoize fetchData to prevent it from being recreated on every render
+  const fetchData = useCallback(async () => {
     try {
       const response = await axios.get('http://localhost:3002/api/nic-validation', {
         params: filters,
@@ -19,11 +20,12 @@ function Management() {
     } catch (err) {
       console.error('Failed to fetch NIC data:', err);
     }
-  };
+  }, [filters]);
 
+  // useEffect will only rerun when fetchData changes (when filters change)
   useEffect(() => {
     fetchData();
-  }, [filters]);
+  }, [fetchData]);
 
   const handleFilterChange = (e) => {
     setFilters({

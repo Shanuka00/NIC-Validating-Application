@@ -83,4 +83,45 @@ const getNicData = async (req, res) => {
   }
 };
 
-module.exports = { validateNics, getNicData };
+const getNicStats = async (req, res) => {
+  try {
+    const stats = await db.nic.findAll({
+      attributes: [
+        'gender',
+        [db.sequelize.fn('COUNT', db.sequelize.col('id')), 'count'],
+        [db.sequelize.fn('DATE', db.sequelize.col('createdAt')), 'date'],
+      ],
+      where: {
+        createdAt: {
+          [Op.gte]: db.sequelize.literal("DATE_SUB(CURDATE(), INTERVAL 7 DAY)")
+        }
+      },
+      group: ['gender', 'date'],
+      order: [['date', 'ASC']],
+    });
+
+    res.json(stats);
+  } catch (err) {
+    console.error('Failed to fetch NIC stats:', err);
+    res.status(500).json({ error: 'Failed to fetch NIC stats' });
+  }
+};
+
+const getGenderDistribution = async (req, res) => {
+  try {
+    const distribution = await db.nic.findAll({
+      attributes: [
+        'gender',
+        [db.sequelize.fn('COUNT', db.sequelize.col('id')), 'count'],
+      ],
+      group: ['gender'],
+    });
+
+    res.json(distribution);
+  } catch (err) {
+    console.error('Failed to fetch gender distribution:', err);
+    res.status(500).json({ error: 'Failed to fetch gender distribution' });
+  }
+};
+
+module.exports = { validateNics, getNicData, getNicStats, getGenderDistribution };
