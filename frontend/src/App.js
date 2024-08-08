@@ -5,6 +5,8 @@ import Start from "./pages/start";
 import Login from "./pages/login";
 import Signup from "./pages/signup";
 import Dashboard from "./pages/dashboard";
+import Validator from "./pages/validator";
+import Management from "./pages/management";
 
 function App() {
   return (
@@ -31,6 +33,16 @@ function App() {
         <Route path="/dashboard" element={
             <div className="flex min-h-screen bg-gray-200">
               <Dashboard />
+            </div>
+          } />
+        <Route path="/validator" element={
+            <div className="flex min-h-screen bg-gray-200">
+              <Validator />
+            </div>
+          } />
+        <Route path="/management" element={
+            <div className="flex min-h-screen bg-gray-200">
+              <Management />
             </div>
           } />
 

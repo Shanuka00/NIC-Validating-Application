@@ -1,32 +1,26 @@
 const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const db = require('./config/db.config.js');
+const nicRoutes = require('./routes/nicValidation.routes.js');
+
 const app = express();
-app.use(express.json());
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-// NIC Validation endpoint
-app.post('/validate-nic', (req, res) => {
-  // Dummy data array
-  const dummyData = [
-    { nic: '123456789V' },
-    { nic: '987654321X' },
-    { nic: '123123123V' },
-    { nic: '456456456X' }
-  ];
-
-  // Process dummy data
-  const results = dummyData.map(data => {
-    // Assuming NIC is in a column named 'nic'
-    const nic = data.nic;
-    // Validate NIC and extract details (mock logic)
-    const birthday = '1990-01-01'; // Replace with actual logic
-    const age = 30; // Replace with actual logic
-    const gender = 'Male'; // Replace with actual logic
-    return { nic, birthday, age, gender };
-  });
-
-  // Send the response
-  res.json(results);
+// Sync database
+db.sequelize.sync().then(() => {
+    console.log('Database synchronized');
+}).catch((err) => {
+    console.error('Failed to synchronize database:', err.message);
 });
 
-app.listen(3002, () => {
-  console.log('NIC validation service running on port 3002');
+// Routes
+app.use('/api/nic-validation', nicRoutes);
+
+// Start server
+const PORT = process.env.PORT || 3002;
+app.listen(PORT, () => {
+    console.log(`NIC Validation Service running on port ${PORT}`);
 });
