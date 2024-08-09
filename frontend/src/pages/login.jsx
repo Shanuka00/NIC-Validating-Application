@@ -41,9 +41,9 @@ function Login() {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-light-blue-50 ml-auto mr-auto">
+    <div className="flex justify-center items-center h-screen bg-light-cyan-50 ml-auto mr-auto">
       <div className="w-full max-w-md p-8 bg-white shadow-lg rounded-lg">
-        <h2 className="text-3xl font-bold text-center text-blue-600 mb-8">Login</h2>
+        <h2 className="text-3xl font-bold text-center text-cyan-700 mb-8">Login</h2>
         
         <form onSubmit={handleSubmit}>
           <div className="mb-6">
@@ -54,7 +54,7 @@ function Login() {
               value={formData.username}
               onChange={handleChange}
               placeholder="Enter your username"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
             />
           </div>
 
@@ -66,18 +66,18 @@ function Login() {
               value={formData.password}
               onChange={handleChange}
               placeholder="Enter your password"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400"
             />
           </div>
 
           <div className="mb-6 flex justify-between items-center">
-            <Link to="/forgot-password" className="text-blue-500 hover:text-blue-700 text-sm font-medium ml-auto mr-auto">Forgot Password?</Link>
+            <Link to="/forgot-password" className="text-cyan-500 hover:text-cyan-700 text-sm font-medium ml-auto mr-auto">Forgot Password?</Link>
           </div>
 
           <div className="mb-6 flex justify-between items-center">
             <button
               type="submit"
-              className="w-full py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full py-2 px-4 bg-cyan-600 text-white font-semibold rounded-lg shadow-md hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-400"
             >
               Login
             </button>
@@ -85,7 +85,7 @@ function Login() {
 
           <div className="text-center text-sm text-gray-600 mt-4">
             <span className="mr-1">New to here?</span>
-            <Link to="/signup" className="text-blue-500 hover:text-blue-700 font-medium">Signup</Link>
+            <Link to="/signup" className="text-cyan-500 hover:text-cyan-700 font-medium">Signup</Link>
           </div>
         </form>
       </div>
