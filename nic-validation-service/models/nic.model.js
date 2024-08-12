@@ -7,7 +7,8 @@ module.exports = (sequelize, DataTypes) => {
         },
         nic_number: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: false,
+            unique: true
         },
         birthday: {
             type: DataTypes.DATEONLY,

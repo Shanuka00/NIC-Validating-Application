@@ -19,7 +19,7 @@ const header = ({ title }) => {
             />
           </RLink>
           <div>
-            <h2 className="text-sm pl-1 text-gray-500 font-semibold sm:text-lg">{title}</h2>
+            <h2 className="text-sm pl-1 text-gray-600 font-semibold sm:text-lg">{title}</h2>
           </div>
         </div>
 

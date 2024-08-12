@@ -20,7 +20,15 @@ const validateNics = async (req, res) => {
         const details = getNicDetails(nic);
         if (details) {
           results.push({ ...details, file_name: fileName });
-          await db.nic.create({ nic_number: nic, ...details, file_name: fileName });
+          try {
+            await db.nic.create({ nic_number: nic, ...details, file_name: fileName });
+          } catch (error) {
+            if (error.name === 'SequelizeUniqueConstraintError') {
+              console.log(`NIC ${nic} already exists in the database. Skipping insertion.`);
+            } else {
+              throw error; // Re-throw unexpected errors
+            }
+          }
         }
       }
     }
@@ -93,7 +101,7 @@ const getNicStats = async (req, res) => {
       ],
       where: {
         createdAt: {
-          [Op.gte]: db.sequelize.literal("DATE_SUB(CURDATE(), INTERVAL 7 DAY)")
+          [Op.gte]: db.sequelize.literal("DATE_SUB(CURDATE(), INTERVAL 6 DAY)")
         }
       },
       group: ['gender', 'date'],

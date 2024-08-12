@@ -39,14 +39,14 @@ function App() {
           } />
           <Route path="/validator" element={
             <div className="min-h-screen bg-gray-200">
-              <Header title="Validator" />
+              <Header title="NIC Validator" />
               <Validator />
               <Footer />
             </div>
           } />
           <Route path="/management" element={
             <div className="min-h-screen bg-gray-200">
-              <Header title="Management" />
+              <Header title="Data Management and Reporting" />
               <Management />
               <Footer />
             </div>
