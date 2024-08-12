@@ -7,44 +7,44 @@ import Swal from 'sweetalert2';
 import 'tailwindcss/tailwind.css';
 
 function Management() {
-  const [nicData, setNicData] = useState([]);
+  const [nicData, setNicData] = useState([]); // State for NIC data
   const [filters, setFilters] = useState({
     date: '',
     gender: '',
     file_name: '',
-  });
+  }); // State for filters
 
   const fetchData = useCallback(async () => {
     try {
       const response = await axios.get('http://localhost:3002/api/nic-validation', {
         params: filters,
-      });
+      }); // Fetch NIC data with filters
       setNicData(response.data);
     } catch (err) {
       console.error('Failed to fetch NIC data:', err);
     }
-  }, [filters]);
+  }, [filters]); // Dependency array for fetchData
 
   useEffect(() => {
-    fetchData();
+    fetchData(); // Fetch data when component mounts or filters change
   }, [fetchData]);
 
   const handleFilterChange = (e) => {
     setFilters({
       ...filters,
       [e.target.name]: e.target.value,
-    });
+    }); // Update filter values
   };
 
   const generateCSV = () => {
-    const csv = Papa.unparse(nicData);
+    const csv = Papa.unparse(nicData); // Convert NIC data to CSV
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = 'nic_data.csv';
-    a.click();
-    URL.revokeObjectURL(url);
+    a.click(); // Trigger download
+    URL.revokeObjectURL(url); // Clean up
   };
 
   const generatePDF = () => {

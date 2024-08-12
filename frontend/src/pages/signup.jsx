@@ -41,7 +41,7 @@ function Signup() {
         icon: 'success',
         confirmButtonText: 'OK'
       }).then(() => {
-        navigate('/login'); // Redirect to login page after success
+        navigate('/login');
       });
     } catch (error) {
       Swal.fire({

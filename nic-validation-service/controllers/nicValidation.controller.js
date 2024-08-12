@@ -4,6 +4,7 @@ const { getNicDetails } = require('../utils/nicUtils.js');
 const db = require('../config/db.config.js');
 const { Op } = require('sequelize');
 
+// Handle NIC validation
 const validateNics = async (req, res) => {
   const files = req.files;
   const results = [];
@@ -39,6 +40,7 @@ const validateNics = async (req, res) => {
   }
 };
 
+// Parse CSV buffer to extract NIC numbers
 const parseCsv = (buffer) => {
   return new Promise((resolve, reject) => {
     const nicNumbers = [];
@@ -47,12 +49,13 @@ const parseCsv = (buffer) => {
     readableStream.push(null);
 
     readableStream.pipe(csv())
-      .on('data', (data) => nicNumbers.push(data.nic))
+      .on('data', (data) => nicNumbers.push(data.nic)) // Collect NIC numbers from CSV data
       .on('end', () => resolve(nicNumbers))
       .on('error', (error) => reject(error));
   });
 };
 
+// Get NIC data based on query parameters
 const getNicData = async (req, res) => {
   const { date, gender, file_name } = req.query;
 
@@ -82,7 +85,7 @@ const getNicData = async (req, res) => {
   try {
     const nicData = await db.nic.findAll({
       where: whereConditions,
-      order: [['createdAt', 'DESC']],
+      order: [['createdAt', 'DESC']], // Order results by creation date
     });
     res.json(nicData);
   } catch (err) {
@@ -91,6 +94,7 @@ const getNicData = async (req, res) => {
   }
 };
 
+// Get statistics of NICs over the last 7 days
 const getNicStats = async (req, res) => {
   try {
     const stats = await db.nic.findAll({
@@ -115,6 +119,7 @@ const getNicStats = async (req, res) => {
   }
 };
 
+// Get gender distribution of NICs
 const getGenderDistribution = async (req, res) => {
   try {
     const distribution = await db.nic.findAll({

@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useDropzone } from 'react-dropzone';
 import 'tailwindcss/tailwind.css';
 
 function Validator() {
   const [files, setFiles] = useState([]);
-  const [validationResults, setValidationResults] = useState(null);
+  const [validationResults, setValidationResults] = useState(null); // State for validation results
   const [error, setError] = useState(null);
+  const [showNoDataMessage, setShowNoDataMessage] = useState(true); // State to show "No files uploaded yet" message
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: (acceptedFiles) => {
@@ -16,6 +17,7 @@ function Validator() {
       }
       setFiles(acceptedFiles);
       setError(null);
+      setShowNoDataMessage(false); // hide message and svg icon
     },
     accept: '.csv',
   });
@@ -38,14 +40,20 @@ function Validator() {
         },
       });
       setValidationResults(response.data.data);
-      setError(null);
+      setError(null); // Clear any previous errors
     } catch (err) {
-      setError('Failed to validate NICs');
+      setError('Failed to validate NICs'); // Set error message if validation fails
     }
   };
 
+  useEffect(() => {
+    if (validationResults) {
+      setShowNoDataMessage(false); // Hide message when results are available
+    }
+  }, [validationResults]);
+
   return (
-    <div className="container mx-auto p-6 pt-28 h-screen px-8 mb-10 pb-10">
+    <div className="container mx-auto p-6 pt-28 px-8 flex-grow">
 
       <div className="flex flex-col md:flex-row items-start gap-4 mb-6">
         <div
@@ -85,10 +93,30 @@ function Validator() {
         )}
       </div>
 
+      {showNoDataMessage && !validationResults && (
+        <div className="flex flex-col items-center justify-center min-h-[356px] opacity-50">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-16 w-16 mb-4 text-gray-500"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M17 17L21 21M21 17L17 21M13 3H8.2C7.0799 3 6.51984 3 6.09202 3.21799C5.71569 3.40973 5.40973 3.71569 5.21799 4.09202C5 4.51984 5 5.0799 5 6.2V17.8C5 18.9201 5 19.4802 5.21799 19.908C5.40973 20.2843 5.71569 20.5903 6.09202 20.782C6.51984 21 7.0799 21 8.2 21H13M13 3L19 9M13 3V7.4C13 7.96005 13 8.24008 13.109 8.45399C13.2049 8.64215 13.3578 8.79513 13.546 8.89101C13.7599 9 14.0399 9 14.6 9H19M19 9V14M9 17H13M9 13H15M9 9H10"
+            />
+          </svg>
+          <p className="text-lg text-gray-500">No files uploaded yet</p>
+        </div>
+      )}
+
       {error && <p className="text-red-500 text-center">{error}</p>}
 
       {validationResults && (
-        <div className="bg-white p-4 rounded-lg shadow-lg mt-6 mb-10">
+        <div className="bg-white p-4 rounded-lg shadow-lg mt-6">
           <h3 className="text-xl font-bold mb-4">Validation Results:</h3>
           <ul className="list-disc pl-5">
             {validationResults.map((result, index) => (

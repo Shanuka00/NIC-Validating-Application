@@ -9,6 +9,7 @@ import Validator from "./pages/validator";
 import Management from "./pages/management";
 import Header from "./pages/header";
 import Footer from "./pages/footer";
+import ProtectedRoute from './pages/protectedRoute';
 
 function App() {
   return (
@@ -31,25 +32,31 @@ function App() {
             </div>
           } />
           <Route path="/dashboard" element={
-            <div className="min-h-screen bg-gray-200">
-              <Header title="Dashboard" />
-              <Dashboard />
-              <Footer />
-            </div>
+            <ProtectedRoute>
+              <div className="min-h-screen bg-gray-200">
+                <Header title="Dashboard" />
+                <Dashboard />
+                <Footer />
+              </div>
+            </ProtectedRoute>
           } />
           <Route path="/validator" element={
-            <div className="min-h-screen bg-gray-200">
-              <Header title="NIC Validator" />
-              <Validator />
-              <Footer />
-            </div>
+            <ProtectedRoute>
+              <div className="min-h-screen bg-gray-200">
+                <Header title="NIC Validator" />
+                <Validator />
+                <Footer />
+              </div>
+            </ProtectedRoute>
           } />
           <Route path="/management" element={
-            <div className="min-h-screen bg-gray-200">
-              <Header title="Data Management and Reporting" />
-              <Management />
-              <Footer />
-            </div>
+            <ProtectedRoute>
+              <div className="min-h-screen bg-gray-200">
+                <Header title="Data Management and Reporting" />
+                <Management />
+                <Footer />
+              </div>
+            </ProtectedRoute>
           } />
         </Routes>
         <Helmet>
