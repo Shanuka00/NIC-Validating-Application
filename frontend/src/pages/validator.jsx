@@ -45,8 +45,7 @@ function Validator() {
   };
 
   return (
-    <div className="container mx-auto p-6">
-      <h2 className="text-3xl font-bold mb-6 text-center">NIC Validator</h2>
+    <div className="container mx-auto p-6 pt-28 h-screen px-8 mb-10 pb-10">
 
       <div className="flex flex-col md:flex-row items-start gap-4 mb-6">
         <div
@@ -65,7 +64,7 @@ function Validator() {
 
         <button
           onClick={handleValidate}
-          className="bg-blue-500 text-white px-6 py-3 h-16 mt-1.5 rounded-lg shadow-lg hover:bg-blue-600 transition duration-300 ease-in-out"
+          className="bg-cyan-600 text-white px-6 py-3 h-16 mt-1.5 rounded-lg shadow-lg hover:bg-cyan-700 transition duration-300 ease-in-out"
         >
           Validate
         </button>
@@ -89,7 +88,7 @@ function Validator() {
       {error && <p className="text-red-500 text-center">{error}</p>}
 
       {validationResults && (
-        <div className="bg-white p-4 rounded-lg shadow-lg mt-6">
+        <div className="bg-white p-4 rounded-lg shadow-lg mt-6 mb-10">
           <h3 className="text-xl font-bold mb-4">Validation Results:</h3>
           <ul className="list-disc pl-5">
             {validationResults.map((result, index) => (
