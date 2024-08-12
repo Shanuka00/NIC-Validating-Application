@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import '../styles/forgotpass.css';
 
 axios.defaults.baseURL = 'http://localhost:3001/auth'; // Default base URL for axios
 
@@ -25,7 +26,10 @@ function Login() {
         title: 'Success!',
         text: 'Login successful.',
         icon: 'success',
-        confirmButtonText: 'OK'
+        confirmButtonText: 'OK',
+        customClass: {
+          confirmButton: 'custom-button'
+        }
       }).then(() => {
         localStorage.setItem('token', response.data.token); // Store token in localStorage
         navigate('/dashboard');
@@ -35,9 +39,37 @@ function Login() {
         title: 'Error!',
         text: error.response?.data?.error || 'Login failed.',
         icon: 'error',
-        confirmButtonText: 'OK'
+        confirmButtonText: 'OK',
+        customClass: {
+          confirmButton: 'custom-button'
+        }
       });
     }
+  };
+
+  // forgot password alert
+  const forgotPass = () => {
+    Swal.fire({
+      title: "I couldn't add the forgotten password option in time!",
+      text: "Sorry about that 🥲",
+      showClass: {
+        popup: `
+          animate__animated
+          animate__fadeInUp
+          animate__faster
+        `
+      },
+      hideClass: {
+        popup: `
+          animate__animated
+          animate__fadeOutUp
+          animate__faster
+        `
+      },
+      customClass: {
+        confirmButton: 'custom-button'
+      }
+    });    
   };
 
   return (
@@ -71,7 +103,7 @@ function Login() {
           </div>
 
           <div className="mb-6 flex justify-between items-center">
-            <Link to="/forgot-password" className="text-cyan-500 hover:text-cyan-700 text-sm font-medium ml-auto mr-auto">Forgot Password?</Link>
+            <label onClick={forgotPass} className="text-cyan-500 hover:text-cyan-700 text-sm font-medium ml-auto mr-auto">Forgot Password?</label>
           </div>
 
           <div className="mb-6 flex justify-between items-center">
