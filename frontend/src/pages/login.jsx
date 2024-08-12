@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 
-axios.defaults.baseURL = 'http://localhost:3001/auth';
+axios.defaults.baseURL = 'http://localhost:3001/auth'; // Default base URL for axios
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -28,7 +28,7 @@ function Login() {
         confirmButtonText: 'OK'
       }).then(() => {
         localStorage.setItem('token', response.data.token); // Store token in localStorage
-        navigate('/dashboard'); // Redirect to dashboard
+        navigate('/dashboard');
       });
     } catch (error) {
       Swal.fire({

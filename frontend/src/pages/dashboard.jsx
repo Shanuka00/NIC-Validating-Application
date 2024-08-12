@@ -19,11 +19,13 @@ function Dashboard() {
   const [barData, setBarData] = useState([]);
   const [pieData, setPieData] = useState([]);
 
+  // Fetch NIC stats for the last 7 days
   const fetchNicStats = async () => {
     try {
       const response = await axios.get('http://localhost:3002/api/nic-validation/stats/last7days');
       const data = response.data;
 
+      // Group data by date and gender
       const groupedData = data.reduce((acc, item) => {
         if (!acc[item.date]) {
           acc[item.date] = { date: item.date, male: 0, female: 0 };
@@ -36,34 +38,36 @@ function Dashboard() {
         return acc;
       }, {});
 
-      setBarData(Object.values(groupedData));
+      setBarData(Object.values(groupedData)); // Set data for bar chart
     } catch (err) {
       console.error('Failed to fetch NIC stats:', err);
     }
   };
 
+  // Fetch gender distribution data
   const fetchGenderDistribution = async () => {
     try {
       const response = await axios.get('http://localhost:3002/api/nic-validation/stats/gender-distribution');
       const data = response.data;
 
+      // Format data for pie chart
       const formattedData = data.map(item => ({
         name: item.gender,
         value: item.count,
       }));
 
-      setPieData(formattedData);
+      setPieData(formattedData); // Set data for pie chart
     } catch (err) {
       console.error('Failed to fetch gender distribution:', err);
     }
   };
 
   useEffect(() => {
-    fetchNicStats();
-    fetchGenderDistribution();
+    fetchNicStats(); // Fetch bar chart data on mount
+    fetchGenderDistribution(); // Fetch pie chart data on mount
   }, []);
 
-  const COLORS = ['#D95890', '#106DB5'];
+  const COLORS = ['#D95890', '#106DB5']; // Define colors for pie chart
 
   return (
 
