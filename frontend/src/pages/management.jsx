@@ -4,26 +4,38 @@ import Papa from 'papaparse';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import Swal from 'sweetalert2';
+import ReactPaginate from 'react-paginate';
 import 'tailwindcss/tailwind.css';
 
 function Management() {
-  const [nicData, setNicData] = useState([]); // State for NIC data
+  const [nicData, setNicData] = useState([]);
   const [filters, setFilters] = useState({
     date: '',
     gender: '',
     file_name: '',
   }); // State for filters
+  const [pageCount, setPageCount] = useState(0);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (selectedPage = 0) => {
     try {
       const response = await axios.get('http://localhost:3002/api/nic-validation', {
-        params: filters,
-      }); // Fetch NIC data with filters
-      setNicData(response.data);
+        params: {
+          ...filters,
+          page: selectedPage + 1,
+        },
+      });
+  
+      // Log the response to verify its structure
+      console.log(response.data);
+  
+      // Ensure nicData is always an array
+      setNicData(response.data.data || []);
+      setPageCount(response.data.totalPages || 0);
     } catch (err) {
       console.error('Failed to fetch NIC data:', err);
     }
-  }, [filters]); // Dependency array for fetchData
+  }, [filters]);  
+  
 
   useEffect(() => {
     fetchData(); // Fetch data when component mounts or filters change
@@ -93,6 +105,10 @@ function Management() {
     });
   };
 
+  const handlePageClick = (data) => {
+    fetchData(data.selected); // Fetch data for the selected page
+  };
+
   return (
     <div className="container mx-auto p-4 pt-28 px-8">
       <div className="flex w-full">
@@ -150,20 +166,60 @@ function Management() {
           </tr>
         </thead>
         <tbody>
-          {nicData.map((nic, index) => (
-            <tr key={index}>
-              <td className="border border-gray-300 p-2">{nic.nic_number}</td>
-              <td className="border border-gray-300 p-2">{nic.birthday}</td>
-              <td className="border border-gray-300 p-2">{nic.age}</td>
-              <td className="border border-gray-300 p-2">{nic.gender}</td>
-              <td className="border border-gray-300 p-2">{nic.file_name}</td>
-              <td className="border border-gray-300 p-2">
-                {new Date(nic.createdAt).toLocaleDateString()}
+          {nicData.length > 0 ? (
+            nicData.map((nic, index) => (
+              <tr key={index}>
+                <td className="border border-gray-300 p-2">{nic.nic_number}</td>
+                <td className="border border-gray-300 p-2">{nic.birthday}</td>
+                <td className="border border-gray-300 p-2">{nic.age}</td>
+                <td className="border border-gray-300 p-2">{nic.gender}</td>
+                <td className="border border-gray-300 p-2">{nic.file_name}</td>
+                <td className="border border-gray-300 p-2">
+                  {new Date(nic.createdAt).toLocaleDateString()}
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="6" className="border border-gray-300 p-2 text-center">
+                No data available
               </td>
             </tr>
-          ))}
+          )}
         </tbody>
+
+
       </table>
+
+      <div className="mt-4 flex justify-center">
+  <ReactPaginate
+    previousLabel={
+      <button className="px-4 py-2 bg-cyan-600 text-white rounded-lg cursor-pointer">
+        Previous
+      </button>
+    }
+    nextLabel={
+      <button className="px-4 py-2 bg-cyan-600 text-white rounded-lg cursor-pointer">
+        Next
+      </button>
+    }
+    breakLabel={'...'}
+    breakClassName={'px-4 py-2 text-white cursor-pointer'}
+    pageCount={pageCount}
+    marginPagesDisplayed={2}
+    pageRangeDisplayed={5}
+    onPageChange={handlePageClick}
+    containerClassName={'flex items-center space-x-2'}
+    subContainerClassName={'flex items-center space-x-2'}
+    activeClassName={'bg-cyan-600 text-white border border-cyan-600'}
+    pageClassName={'px-4 py-2 border border-gray-300 rounded-lg cursor-pointer'}
+    pageLinkClassName={'text-cyan-800'}
+    previousClassName={'px-4 py-2 border border-gray-300 rounded-lg text-white cursor-pointer'}
+    nextClassName={'px-4 py-2 border border-gray-300 rounded-lg text-white cursor-pointer'}
+  />
+</div>
+
+
     </div>
   );
 }
