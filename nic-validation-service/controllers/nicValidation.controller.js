@@ -57,18 +57,19 @@ const parseCsv = (buffer) => {
 
 // Get NIC data based on query parameters
 const getNicData = async (req, res) => {
-  const { date, gender, file_name } = req.query;
+  const { date, gender, file_name, page = 1, limit = 15 } = req.query;
 
   const whereConditions = {};
 
   if (date) {
     const startDate = new Date(date);
     const endDate = new Date(date);
-    endDate.setDate(endDate.getDate() + 1);
+    endDate.setDate(endDate.getDate());
+    endDate.setHours(23, 59, 59, 999);
 
     whereConditions.createdAt = {
       [Op.gte]: startDate,
-      [Op.lt]: endDate,
+      [Op.lte]: endDate,
     };
   }
 
@@ -83,16 +84,24 @@ const getNicData = async (req, res) => {
   }
 
   try {
-    const nicData = await db.nic.findAll({
+    const { count, rows } = await db.nic.findAndCountAll({
       where: whereConditions,
-      order: [['createdAt', 'DESC']], // Order results by creation date
+      order: [['createdAt', 'DESC']],
+      limit: parseInt(limit),
+      offset: (parseInt(page) - 1) * parseInt(limit),
     });
-    res.json(nicData);
+
+    res.json({
+      totalPages: Math.ceil(count / limit),
+      currentPage: parseInt(page),
+      data: rows,
+    });
   } catch (err) {
     console.error('Failed to fetch NIC data:', err);
     res.status(500).json({ error: 'Failed to fetch NIC data' });
   }
 };
+
 
 // Get statistics of NICs over the last 7 days
 const getNicStats = async (req, res) => {
