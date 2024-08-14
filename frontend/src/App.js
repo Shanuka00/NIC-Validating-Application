@@ -4,6 +4,7 @@ import { Helmet, HelmetProvider } from 'react-helmet-async';
 import Start from "./pages/start";
 import Login from "./pages/login";
 import Signup from "./pages/signup";
+import Forgot from "./pages/forgot";
 import Dashboard from "./pages/dashboard";
 import Validator from "./pages/validator";
 import Management from "./pages/management";
@@ -29,6 +30,11 @@ function App() {
           <Route path="/signup" element={
             <div className="flex min-h-screen bg-gray-200">
               <Signup />
+            </div>
+          } />
+          <Route path="/forgotpass" element={
+            <div className="flex min-h-screen bg-gray-200">
+              <Forgot />
             </div>
           } />
           <Route path="/dashboard" element={
