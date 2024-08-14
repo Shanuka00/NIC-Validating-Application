@@ -2,6 +2,9 @@ const User = require('../models/user.model');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+const otpStore = require('../utils/otpStore');
+const emailService = require('../utils/emailService');
+
 // Handle user registration
 exports.register = async (req, res) => {
   console.log('Received registration request:', req.body);
@@ -41,4 +44,49 @@ exports.login = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: 'Failed to login' });
   }
+};
+
+// Send OTP to email
+exports.sendOtp = (req, res) => {
+  const { email } = req.body;
+
+  console.log('Received send OTP request:', email);
+
+  // Generate a random OTP
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+  // Store OTP associated with the email
+  otpStore.setOtp(email, otp);
+
+  // Send OTP via email
+  emailService.sendEmail(email, `Your OTP is: ${otp}`);
+
+  res.status(200).json({ message: 'OTP sent successfully' });
+};
+
+// Verify OTP
+exports.verifyOtp = (req, res) => {
+  const { email, otp } = req.body;
+
+  // Verify OTP
+  if (otpStore.verifyOtp(email, otp)) {
+    otpStore.clearOtp(email); // Clear OTP after successful verification
+    res.status(200).json({ message: 'OTP verified successfully' });
+  } else {
+    res.status(400).json({ message: 'Invalid OTP' });
+  }
+};
+
+// Change user password
+exports.changePassword = (req, res) => {
+  const { email, newPassword } = req.body;
+
+  // Hash the new password before saving it
+  User.update({ password: bcrypt.hashSync(newPassword, 10) }, { where: { email } })
+    .then(() => {
+      res.status(200).json({ message: 'Password changed successfully' });
+    })
+    .catch(() => {
+      res.status(500).json({ error: 'Failed to change password' });
+    });
 };
