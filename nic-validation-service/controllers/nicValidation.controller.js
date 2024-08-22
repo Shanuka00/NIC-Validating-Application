@@ -7,7 +7,8 @@ const { Op } = require('sequelize');
 // Handle NIC validation
 const validateNics = async (req, res) => {
   const files = req.files;
-  const results = [];
+  const validResults = [];
+  const invalidResults = [];
 
   if (files.length !== 4) {
     return res.status(400).json({ error: 'Please upload exactly 4 files.' });
@@ -17,28 +18,32 @@ const validateNics = async (req, res) => {
     for (const file of files) {
       const nicNumbers = await parseCsv(file.buffer);
       const fileName = file.originalname;
+
       for (const nic of nicNumbers) {
         const details = getNicDetails(nic);
         if (details) {
-          results.push({ ...details, file_name: fileName });
+          validResults.push({ ...details, file_name: fileName });
           try {
             await db.nic.create({ nic_number: nic, ...details, file_name: fileName });
           } catch (error) {
             if (error.name === 'SequelizeUniqueConstraintError') {
               console.log(`NIC ${nic} already exists in the database. Skipping insertion.`);
             } else {
-              throw error; // Re-throw unexpected errors
+              throw error;
             }
           }
+        } else {
+          invalidResults.push({ nic_number: nic, file_name: fileName, reason: 'Invalid NIC format or details' });
         }
       }
     }
-    res.json({ data: results });
+    res.json({ validData: validResults, invalidData: invalidResults });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to validate NICs' });
   }
 };
+
 
 // Parse CSV buffer to extract NIC numbers
 const parseCsv = (buffer) => {
@@ -57,7 +62,7 @@ const parseCsv = (buffer) => {
 
 // Get NIC data based on query parameters
 const getNicData = async (req, res) => {
-  const { date, gender, file_name, page = 1, limit = 15 } = req.query;
+  const { date, gender, file_name, page = 1, limit = 12 } = req.query;
 
   const whereConditions = {};
 
