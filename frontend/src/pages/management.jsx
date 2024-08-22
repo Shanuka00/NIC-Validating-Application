@@ -18,7 +18,7 @@ function Management() {
 
   const fetchData = useCallback(async (selectedPage = 0) => {
     try {
-      const response = await axios.get('http://localhost:3002/api/nic-validation', {
+      const response = await axios.get('http://localhost:3003/api/nic-validation', {
         params: {
           ...filters,
           page: selectedPage + 1,

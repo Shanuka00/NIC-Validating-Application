@@ -4,7 +4,7 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import '../styles/forgotpass.css';
 
-axios.defaults.baseURL = 'http://localhost:3001/auth'; // Default base URL for axios
+axios.defaults.baseURL = 'http://localhost:3003/user'; // Default base URL for axios
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -47,31 +47,6 @@ function Login() {
     }
   };
 
-  // forgot password alert I have used previously
-  // const forgotPass = () => {
-  //   Swal.fire({
-  //     title: "I couldn't add the forgotten password option in time!",
-  //     text: "Sorry about that 🥲",
-  //     showClass: {
-  //       popup: `
-  //         animate__animated
-  //         animate__fadeInUp
-  //         animate__faster
-  //       `
-  //     },
-  //     hideClass: {
-  //       popup: `
-  //         animate__animated
-  //         animate__fadeOutUp
-  //         animate__faster
-  //       `
-  //     },
-  //     customClass: {
-  //       confirmButton: 'custom-button'
-  //     }
-  //   });    
-  // };
-
   return (
     <div className="flex justify-center items-center h-screen bg-light-cyan-50 ml-auto mr-auto">
       <div className="w-full max-w-md p-8 bg-white shadow-lg rounded-lg">
@@ -103,7 +78,6 @@ function Login() {
           </div>
 
           <div className="mb-6 flex justify-between items-center">
-            {/* <label onClick={forgotPass} className="text-cyan-500 hover:text-cyan-700 text-sm font-medium ml-auto mr-auto">Forgot Password?</label> */}
             <Link to="/forgotpass" className="text-cyan-500 hover:text-cyan-700 text-sm font-medium ml-auto mr-auto">Forgot Password?</Link>
           </div>
 

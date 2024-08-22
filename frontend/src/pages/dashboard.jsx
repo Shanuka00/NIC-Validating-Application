@@ -22,7 +22,7 @@ function Dashboard() {
   // Fetch NIC stats for the last 7 days
   const fetchNicStats = async () => {
     try {
-      const response = await axios.get('http://localhost:3002/api/nic-validation/stats/last7days');
+      const response = await axios.get('http://localhost:3003/api/nic-validation/stats/last7days');
       const data = response.data;
 
       // Group data by date and gender
@@ -47,7 +47,7 @@ function Dashboard() {
   // Fetch gender distribution data
   const fetchGenderDistribution = async () => {
     try {
-      const response = await axios.get('http://localhost:3002/api/nic-validation/stats/gender-distribution');
+      const response = await axios.get('http://localhost:3003/api/nic-validation/stats/gender-distribution');
       const data = response.data;
 
       // Format data for pie chart

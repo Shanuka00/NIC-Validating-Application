@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useDropzone } from 'react-dropzone';
+import ReactPaginate from 'react-paginate';
 import 'tailwindcss/tailwind.css';
+import '../styles/pagination.css';
 
 function Validator() {
   const [files, setFiles] = useState([]);
-  const [validationResults, setValidationResults] = useState(null); // State for validation results
+  const [validResults, setValidResults] = useState([]);
+  const [invalidResults, setInvalidResults] = useState([]);
   const [error, setError] = useState(null);
-  const [showNoDataMessage, setShowNoDataMessage] = useState(true); // State to show "No files selected yet" message
+  const [showNoDataMessage, setShowNoDataMessage] = useState(true);
+  const [currentPage, setCurrentPage] = useState(0);
+  const resultsPerPage = 10;
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: (acceptedFiles) => {
@@ -17,7 +22,7 @@ function Validator() {
       }
       setFiles(acceptedFiles);
       setError(null);
-      setShowNoDataMessage(false); // hide message and svg icon
+      setShowNoDataMessage(false);
     },
     accept: '.csv',
   });
@@ -34,27 +39,35 @@ function Validator() {
     });
 
     try {
-      const response = await axios.post('http://localhost:3002/api/nic-validation/validate', formData, {
+      const response = await axios.post('http://localhost:3003/api/nic-validation/validate', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-      setValidationResults(response.data.data);
-      setError(null); // Clear any previous errors
+      setValidResults(response.data.validData);
+      setInvalidResults(response.data.invalidData);
+      setError(null);
     } catch (err) {
-      setError('Failed to validate NICs'); // Set error message if validation fails
+      setError('Failed to validate NICs');
     }
   };
 
   useEffect(() => {
-    if (validationResults) {
-      setShowNoDataMessage(false); // Hide message when results are available
+    if (validResults.length > 0 || invalidResults.length > 0) {
+      setShowNoDataMessage(false);
     }
-  }, [validationResults]);
+  }, [validResults, invalidResults]);
+
+  const handlePageClick = (data) => {
+    setCurrentPage(data.selected);
+  };
+
+  // Slice the results to show only the current page
+  const paginatedValidResults = validResults.slice(currentPage * resultsPerPage, (currentPage + 1) * resultsPerPage);
+  const paginatedInvalidResults = invalidResults.slice(currentPage * resultsPerPage, (currentPage + 1) * resultsPerPage);
 
   return (
     <div className="container mx-auto p-6 pt-28 px-8 flex-grow">
-
       <div className="flex flex-col md:flex-row items-start gap-4 mb-6">
         <div
           {...getRootProps()}
@@ -93,7 +106,7 @@ function Validator() {
         )}
       </div>
 
-      {showNoDataMessage && !validationResults && (
+      {showNoDataMessage && !validResults.length && !invalidResults.length && (
         <div className="flex flex-col items-center justify-center min-h-[356px] opacity-50">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -115,20 +128,93 @@ function Validator() {
 
       {error && <p className="text-red-500 text-center">{error}</p>}
 
-      {validationResults && (
-        <div className="bg-white p-4 rounded-lg shadow-lg mt-6">
-          <h3 className="text-xl font-bold mb-4">Validation Results:</h3>
-          <ul className="list-disc pl-5">
-            {validationResults.map((result, index) => (
-              <li key={index} className="mb-2">
-                <span className="font-semibold">NIC:</span> {result.nic_number}, 
-                <span className="font-semibold"> Birthday:</span> {result.birthday}, 
-                <span className="font-semibold"> Age:</span> {result.age}, 
-                <span className="font-semibold"> Gender:</span> {result.gender}, 
-                <span className="font-semibold"> File:</span> {result.file_name}
-              </li>
-            ))}
-          </ul>
+      {validResults.length > 0 && (
+        <div className="bg-blue-50 p-6 rounded-lg shadow-lg mt-6">
+          <h3 className="text-xl font-bold mb-4 text-blue-800">Valid NICs</h3>
+          <table className="min-w-full border-separate border-spacing-2">
+            <thead>
+              <tr className="bg-blue-100 text-left">
+                <th className="p-3 border-b-2 border-blue-200 font-semibold">NIC</th>
+                <th className="p-3 border-b-2 border-blue-200 font-semibold">Birthday</th>
+                <th className="p-3 border-b-2 border-blue-200 font-semibold">Age</th>
+                <th className="p-3 border-b-2 border-blue-200 font-semibold">Gender</th>
+                <th className="p-3 border-b-2 border-blue-200 font-semibold">File</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedValidResults.map((result, index) => (
+                <tr key={index} className="hover:bg-blue-100 transition-colors">
+                  <td className="p-3 border-b border-blue-200">{result.nic_number}</td>
+                  <td className="p-3 border-b border-blue-200">{result.birthday}</td>
+                  <td className="p-3 border-b border-blue-200">{result.age}</td>
+                  <td className="p-3 border-b border-blue-200">{result.gender}</td>
+                  <td className="p-3 border-b border-blue-200">{result.file_name}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <ReactPaginate
+          previousLabel={<span className="text-cyan-600">Previous</span>}
+          nextLabel={<span className="text-cyan-600">Next</span>}
+          breakLabel={<span className="text-cyan-600">...</span>}
+          pageCount={Math.ceil(validResults.length / resultsPerPage)}
+          marginPagesDisplayed={2}
+          pageRangeDisplayed={5}
+          onPageChange={handlePageClick}
+          containerClassName="flex justify-center my-4"
+          pageClassName="mx-1"
+          pageLinkClassName="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-200"
+          previousClassName="mx-1"
+          previousLinkClassName="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-200"
+          nextClassName="mx-1"
+          nextLinkClassName="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-200"
+          breakClassName="mx-1"
+          breakLinkClassName="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-200"
+          activeClassName="text-white border-cyan-600"
+        />
+        </div>
+      )}
+
+      {invalidResults.length > 0 && (
+        <div className="bg-red-50 p-6 rounded-lg shadow-lg mt-6">
+          <h3 className="text-xl font-bold mb-4 text-red-800">Invalid NICs</h3>
+          <table className="min-w-full border-separate border-spacing-2">
+            <thead>
+              <tr className="bg-red-100 text-left">
+                <th className="p-3 border-b-2 border-red-200 font-semibold">NIC</th>
+                <th className="p-3 border-b-2 border-red-200 font-semibold">File</th>
+                <th className="p-3 border-b-2 border-red-200 font-semibold">Reason</th>
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedInvalidResults.map((result, index) => (
+                <tr key={index} className="hover:bg-red-100 transition-colors">
+                  <td className="p-3 border-b border-red-200">{result.nic_number}</td>
+                  <td className="p-3 border-b border-red-200">{result.file_name}</td>
+                  <td className="p-3 border-b border-red-200">{result.reason}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <ReactPaginate
+          previousLabel={<span className="text-cyan-600">Previous</span>}
+          nextLabel={<span className="text-cyan-600">Next</span>}
+          breakLabel={<span className="text-cyan-600">...</span>}
+          pageCount={Math.ceil(validResults.length / resultsPerPage)}
+          marginPagesDisplayed={2}
+          pageRangeDisplayed={5}
+          onPageChange={handlePageClick}
+          containerClassName="flex justify-center my-4"
+          pageClassName="mx-1"
+          pageLinkClassName="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-200"
+          previousClassName="mx-1"
+          previousLinkClassName="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-200"
+          nextClassName="mx-1"
+          nextLinkClassName="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-200"
+          breakClassName="mx-1"
+          breakLinkClassName="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-200"
+          activeClassName="text-white border-cyan-600"
+        />
         </div>
       )}
     </div>

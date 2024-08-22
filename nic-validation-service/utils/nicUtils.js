@@ -2,16 +2,25 @@ const getNicDetails = (nic) => {
   let year, days, gender;
 
   // Validate NIC format
-  if ((typeof nic !== 'string' && typeof nic !== 'int') || (nic.length !== 10 && nic.length !== 13)) {
+  if ((typeof nic !== 'string' && typeof nic !== 'number') || (nic.length !== 10 && nic.length !== 13)) {
     console.warn(`Invalid NIC format: ${nic}`);
     return null;
   }
 
   // Extract year and days based on NIC length
   if (nic.length === 10) {
+    const lastChar = nic.charAt(9).toLowerCase();
+    if (!['v', 'x'].includes(lastChar) || isNaN(nic.substring(0, 9))) {
+      console.warn(`Invalid NIC format for length 10: ${nic}`);
+      return null;
+    }
     year = `19${nic.substring(0, 2)}`;
     days = parseInt(nic.substring(2, 5));
   } else if (nic.length === 13) {
+    if (isNaN(nic)) {
+      console.warn(`Invalid NIC format for length 13: ${nic}`);
+      return null;
+    }
     year = nic.substring(0, 4);
     days = parseInt(nic.substring(4, 7));
   }
